@@ -1,0 +1,13 @@
+/*
+ * Rekt Gang's motto under its badge in sign-up (ConnectingToCorp2,
+ * Orientation2). Webapp sets SN Corp's one-line motto across the bottom of the
+ * 192px logo slot; Rekt Gang's runs to two lines, so it is centred and wraps.
+ */
+.snc-logo-wrapper .sui-text-header {
+  left: 0;
+  right: 0;
+  top: auto;
+  bottom: 0;
+  margin: 0 auto;
+  text-align: center;
+}

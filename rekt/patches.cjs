@@ -128,6 +128,29 @@ module.exports = {
   // The Rekt gallery (rekt/runtime/gallery.js): "Choose Rekt" at sign-up,
   // beside the generated picture, and the edit button on the player's own
   // portrait in their profile.
+  // No recovery key section in sign-up (runtime/account.js): once the player
+  // has chosen their name the key is made and the account created, with
+  // nothing shown, explained or confirmed, and sign-up goes on to Success.
+  'js/controllers/AuthController.js': [
+    [
+      '  signupRecoveryKeyIntro() {\n    const viewModel = new RecoveryKeyIntroViewModel();\n    viewModel.render();\n  }',
+      '  signupRecoveryKeyIntro() {\n    __rekt.account.createAccount(this, MenuPage);\n  }',
+    ],
+  ],
+  'js/view_models/signup/SignupSuccessViewModel.js': [
+    ['<div>Your account has been created. Keep your Recovery Key safe; you will need it if you lose access to your account.</div>',
+      '<div>Your account has been created.</div>'],
+  ],
+  // The Account page: Download Player (a file holding the mnemonic) in place
+  // of Log Out.
+  'js/view_models/account/AccountIndexViewModel.js': [
+    ['<button id="${this.logoutBtnId}" class="sui-screen-btn sui-mod-destructive">Log Out</button>',
+      '${__rekt.account.downloadButtonHTML(this)}'],
+    [
+      "    document.getElementById(this.logoutBtnId).addEventListener('click', () => {\n      MenuPage.router.goto('Account', 'logoutConfirm');\n    });\n",
+      "    __rekt.account.bindDownload(this);\n",
+    ],
+  ],
   'js/view_models/signup/SetUsernameViewModel.js': [
     ...navLabel,
     ['    this.initPfp();\n', '    this.initPfp();\n    __rekt.gallery.mount(this, MenuPage);\n'],

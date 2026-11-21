@@ -34,6 +34,23 @@ module.exports = {
   ],
   'js/managers/SigningClientManager.js': [
     [': `ws://${window.location.hostname}:26657`)', ': (__rekt.guild.chainWs || `ws://${window.location.hostname}:26657`))'],
+    // Under the current protocol the signing queue only sends a player's own
+    // messages built from a gameplay intent; a plain queued message is refused
+    // ("Queued intent requires current-protocol preparation"). Upstream moved
+    // MsgPlayerUpdateName there but not MsgPlayerUpdatePfp, which the Rekt
+    // gallery signs (rekt/runtime/pfp.js, gallery.js).
+    [
+      "const id = this.queue.enqueueImmediate(\n      '/structs.structs.MsgPlayerUpdatePfp',",
+      "const id = this.queue.enqueueGameplayImmediate(\n      '/structs.structs.MsgPlayerUpdatePfp',",
+    ],
+  ],
+  'js/util/GameplayIntent.js': [
+    // Like the name, a player's own pfp: the native handler, exercised by the
+    // signed simulation, checks the signer's authority over the player.
+    [
+      "  '/structs.structs.MsgPlayerUpdateName': null,\n",
+      "  '/structs.structs.MsgPlayerUpdateName': null,\n  '/structs.structs.MsgPlayerUpdatePfp': null,\n",
+    ],
   ],
   'js/api/GuildAPI.js': [
     ["this.apiUrl = '/api';", guildApi('')],

@@ -10,7 +10,7 @@ there is no translation layer.
 | `runtime/` | Loaded before webapp's entry as `__rekt`: `guild` (`guild.js`, the services of the guild the page plays through, Rekt Gang `0-8`), `recovery` (`recovery.js`, moving a recovered player of another guild into it), `pfp` (`pfp.js`, every portrait showing the player's `pfp` URL over the generated one, and setting a sign-up picture as `pfp` on chain) and `gallery` (`gallery.js`, the Rekt NFT gallery, at sign-up and on a member's own profile) |
 | `pfp/` | The Rekt Gang NFTs players choose from, `<collection>/<id>.webp`, and `collections.json`; made by `make_pfps.py` from `../RektGang`, served at `/rekt/pfp/` |
 | `public/` | Static files served over webapp's: `guild.json` (guild `0-8`'s on-chain endpoint), `favicon.ico`, and `rekt/` with `rekt.css`, the sign-up badge, the guild logo and icons |
-| `page.cjs` | Renders webapp's Twig page (`templates/`) to `index.html`, adding the icons and `rekt.css` |
+| `page.cjs` | Renders webapp's Twig page (`templates/`) to `index.html`, adding Google Tag Manager (`GTM-58HZKHDD`), the icons and `rekt.css` |
 | `overlay.cjs`, `loader.cjs` | Apply `patches.cjs` to each source file webpack reads |
 | `check.cjs` | `npm run check` / `npm test`: stale or orphaned patches, SN Corp left on screen, guild.json against `GUILD_ID`, pictures missing from `pfp/` |
 

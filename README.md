@@ -83,6 +83,7 @@ a join minimum, or the chain can't be read (`rekt/runtime/recovery.js`).
 | Entry substation | `4-19`, fed by allocation `6-69` from the guild's own stake |
 | Joining | open: join minimum 0, invite bypass permissioned |
 | Endpoint | `https://rekt.structs.zone/guild.json` |
+| Sign-up (TSA) | player `1-14654` (`structs1h7qgjwzwtyywuwmg4r2dm2gek9ne4gvlq8psad`), the host's proxy-join signer: 512 (GuildMembership) on `0-8`, 1024 (SubstationConnection) on `4-19` |
 | Bank denom | `rug` / `urug` (in guild.json) |
 
 ## Building and serving

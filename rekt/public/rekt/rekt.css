@@ -11,3 +11,207 @@
   margin: 0 auto;
   text-align: center;
 }
+
+/*
+ * A player's own picture (rekt/runtime/pfp.js), over the generated layers.
+ * Webapp's layers are always 72px, centred and raised 4px, since the robot art
+ * is drawn to be cropped by each portrait (40px in the HUD, 44px in result
+ * rows, 72px in the profile and sign-up). A player's picture instead covers
+ * whatever portrait holds it, whole: Rekt art already fills its square, ears
+ * and horns to the edges. --rekt-pfp-zoom zooms in from the centre, if
+ * pictures ever need it, with the overflow hidden by the portrait evenly on
+ * every side. The extra `html` outranks webapp's
+ * `.sui-screen-portrait-image .pfp-viewer-layer` and
+ * `.sui-result-row-portrait img.pfp-viewer-layer` rules. Chickens are pixel
+ * art, and stay sharp.
+ */
+html img.pfp-viewer-layer.rekt-pfp-url {
+  --rekt-pfp-zoom: 100%;
+  top: 50%;
+  left: 50%;
+  width: var(--rekt-pfp-zoom);
+  height: var(--rekt-pfp-zoom);
+  max-width: none;
+  max-height: none;
+  transform: translate(-50%, -50%);
+  object-fit: cover;
+}
+
+.rekt-mod-pixel,
+.rekt-mod-pixel img {
+  image-rendering: pixelated;
+}
+
+/*
+ * The Rekt gallery (rekt/runtime/gallery.js), over the sign-up profile screen
+ * or the player's own profile. Its controls are SUI's own (the screen nav's
+ * tabs, screen buttons, text input, close link); this lays it over the screen
+ * as one edge-to-edge scroll per collection, and outlines the picture found by
+ * number, and the one chosen, in the player's highlight colour.
+ */
+.rekt-gallery-host {
+  position: relative;
+}
+
+.rekt-gallery {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  background: var(--page-background);
+}
+
+.rekt-gallery-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* The collections, as the menu's own nav tabs; scrolled sideways if narrow. */
+.rekt-gallery-tabs {
+  justify-content: flex-start;
+  gap: var(--spacing-sm);
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex: 0 0 auto;
+}
+
+.rekt-gallery-tabs .sui-screen-nav-item,
+.rekt-gallery-tabs .sui-screen-nav-item:link,
+.rekt-gallery-tabs .sui-screen-nav-item:visited {
+  color: var(--accent-primary);
+  border-bottom: 2px solid transparent;
+}
+
+.rekt-gallery-tabs .sui-screen-nav-item:hover,
+.rekt-gallery-tabs .sui-screen-nav-item.sui-mod-active {
+  color: var(--accent-primary-active);
+}
+
+.rekt-gallery-tabs .sui-screen-nav-item.sui-mod-active {
+  border-bottom-color: var(--accent-primary-active);
+}
+
+.rekt-gallery .common-inline-text-input-controls-container {
+  justify-content: flex-start;
+  gap: var(--spacing-md);
+}
+
+.rekt-gallery-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  /* gallery.js keeps the view in place as rows are added above it. */
+  overflow-anchor: none;
+}
+
+.rekt-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+  gap: 0;
+  /* Room for a found picture, lifted at the edge of the gallery. */
+  padding: 10px;
+}
+
+.rekt-gallery-tile {
+  position: relative;
+  display: block;
+  aspect-ratio: 1;
+  padding: 0;
+  border: none;
+  background: var(--surface-default);
+  cursor: pointer;
+}
+
+.rekt-gallery-tile.rekt-mod-missing {
+  cursor: default;
+  background: var(--page-background);
+}
+
+.rekt-gallery-tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The outline sits inside the tile, so it never overlaps a neighbour. */
+.rekt-gallery-tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+button.rekt-gallery-tile:hover::after,
+button.rekt-gallery-tile:focus-visible::after {
+  box-shadow: inset 0 0 0 2px var(--text-player-highlight);
+}
+
+.rekt-gallery-tile.sui-mod-active {
+  border-bottom: none;
+}
+
+.rekt-gallery-tile.sui-mod-active::after {
+  box-shadow: inset 0 0 0 3px var(--text-player-highlight);
+}
+
+/*
+ * Found by number: lifted over its neighbours, with a solid border in the
+ * player's highlight colour and a glow that pulses as it comes into view.
+ */
+.rekt-gallery-tile.rekt-mod-found {
+  z-index: 2;
+  transform: scale(1.15);
+  box-shadow: 0 0 0 3px var(--text-player-highlight), 0 6px 16px 2px rgba(0, 0, 0, 0.7);
+  transition: transform 0.2s ease-out;
+}
+
+.rekt-gallery-tile.rekt-mod-found::after {
+  box-shadow: inset 0 0 0 2px var(--page-background);
+  animation: rekt-gallery-found 1s ease-in-out 3;
+}
+
+@keyframes rekt-gallery-found {
+  0%, 100% { box-shadow: inset 0 0 0 2px var(--page-background), 0 0 0 3px var(--text-player-highlight); }
+  50% { box-shadow: inset 0 0 0 2px var(--page-background), 0 0 0 3px var(--text-player-highlight), 0 0 18px 6px var(--accent-primary); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rekt-gallery-tile.rekt-mod-found {
+    transition: none;
+  }
+
+  .rekt-gallery-tile.rekt-mod-found::after {
+    animation: none;
+  }
+}
+
+/* The player's own profile: the edit button on the portrait's corner. */
+.profile-header-image-container {
+  position: relative;
+}
+
+.rekt-profile-pfp-edit {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  z-index: 1;
+  display: flex;
+  padding: 2px;
+  background: var(--page-background);
+  text-decoration: none;
+}
+
+.rekt-profile-pfp-edit.sui-mod-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.rekt-profile-pfp-status {
+  margin-top: var(--spacing-sm);
+}

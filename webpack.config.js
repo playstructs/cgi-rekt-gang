@@ -25,6 +25,12 @@ const FALLBACK = {
   chainWs: 'wss://public.testnet.structs.network:26657',
 };
 
+// The Rekt pictures players choose from (rekt/make_pfps.py makes them), served
+// at /rekt/pfp/. They are many (24k): served from disk in development and
+// copied into dist/ after a build, rather than passed through webpack.
+const PFP_DIR = path.join(__dirname, 'rekt/pfp');
+const PFP_PATH = 'rekt/pfp';
+
 const PUBLIC_DIRS = [
   path.join(UPSTREAM_SRC, 'public'),
   path.join(__dirname, 'rekt/public'),
@@ -86,6 +92,19 @@ class RektSitePlugin {
   }
 }
 
+/** Copies the Rekt pictures into a build's output (not the dev server's). */
+class RektPfpPlugin {
+  apply(compiler) {
+    compiler.hooks.afterEmit.tapPromise('RektPfpPlugin', async compilation => {
+      if (!fs.existsSync(PFP_DIR)) {
+        compilation.errors.push(new compiler.webpack.WebpackError('rekt: rekt/pfp is missing: run rekt/make_pfps.py'));
+        return;
+      }
+      await fs.promises.cp(PFP_DIR, path.join(compiler.outputPath, PFP_PATH), {recursive: true});
+    });
+  }
+}
+
 module.exports = (env, argv) => {
   const upstream = require(upstreamConfigFile);
   const config = {
@@ -137,11 +156,12 @@ module.exports = (env, argv) => {
         __REKT_CONFIG__: JSON.stringify(config),
       }),
       new RektSitePlugin(),
+      ...(env.WEBPACK_SERVE ? [] : [new RektPfpPlugin()]),
     ],
     performance: {hints: false},
     devServer: {
       port: 5191,
-      static: false,
+      static: {directory: PFP_DIR, publicPath: `/${PFP_PATH}`, watch: false},
       hot: false,
       liveReload: true,
       client: {overlay: {errors: true, warnings: false}},

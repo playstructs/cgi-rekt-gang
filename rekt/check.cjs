@@ -4,6 +4,7 @@
 //   orphan    a patched file no longer exists upstream
 //   branding  SN Corp is still named somewhere a player would see it
 //   guild     public/guild.json disagrees with the guild webpack.config.js fixes
+//   pfp       a picture pfp/collections.json lists is missing from rekt/pfp/
 //
 // node rekt/check.cjs prints the report; --strict (npm test) fails on any of them.
 const fs = require('node:fs');
@@ -52,9 +53,24 @@ if (guildJson.guild?.id !== GUILD_ID) {
   report('guild', `public/guild.json is ${guildJson.guild?.id}, webpack.config.js fixes ${GUILD_ID}`);
 }
 
+// Every picture the gallery offers is hosted (rekt/make_pfps.py makes them).
+const PFP = path.join(__dirname, 'pfp');
+const collectionsFile = path.join(PFP, 'collections.json');
+if (!fs.existsSync(collectionsFile)) {
+  report('pfp', 'rekt/pfp/collections.json is missing: run rekt/make_pfps.py');
+} else {
+  for (const c of JSON.parse(fs.readFileSync(collectionsFile, 'utf8'))) {
+    const lacking = [];
+    for (let id = c.first; id <= c.last; id++) {
+      if (!c.missing.includes(id) && !fs.existsSync(path.join(PFP, c.slug, `${id}.webp`))) lacking.push(id);
+    }
+    if (lacking.length) report('pfp', `${c.slug}: ${lacking.length} missing (${lacking.slice(0, 5).join(', ')}${lacking.length > 5 ? ', …' : ''})`);
+  }
+}
+
 problems.forEach(line => console.log(line));
 const count = kind => problems.filter(line => line.startsWith(kind)).length;
-console.log(['stale', 'orphan', 'branding', 'guild'].map(kind => `${count(kind)} ${kind}`).join(', '));
+console.log(['stale', 'orphan', 'branding', 'guild', 'pfp'].map(kind => `${count(kind)} ${kind}`).join(', '));
 if (strict && problems.length) {
   process.exitCode = 1;
 }

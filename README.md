@@ -40,9 +40,72 @@ runs the check, which lists what the update touched:
 | `orphan` | a patched upstream file is gone | move or delete its patches |
 | `branding` | SN Corp is named somewhere a player sees | add a patch naming Rekt Gang |
 | `guild` | `rekt/public/guild.json` and `GUILD_ID` disagree | fix whichever is wrong |
+| `pfp` | a picture `rekt/pfp/collections.json` lists isn't in `rekt/pfp/` | run `rekt/make_pfps.py` |
 
 `npm test` fails while any remain. The build shows stale patches as warnings.
 Commit the submodule pointer together with the overlay.
+
+## Profile pictures
+
+Every portrait (the HUD, profile, guild roster, player search, scans, spectator
+and device activation) shows the player's own picture, their `pfp` on chain,
+when it is a URL a browser can load: `https` (`http` is upgraded), or `ipfs://`,
+`ipns://` and `ar://` through the ipfs.io and arweave.net gateways. webapp's
+generated portrait stays underneath, and shows when a player has no such
+picture or it fails to load (`rekt/runtime/pfp.js`). Sector Blitz's public raid
+lists are the exception: the guild API sends them only the generated portrait's
+attributes, so they show a player's picture only when it is in those too, as it
+is for everyone who signs up here.
+
+### The Rekt gallery
+
+Members choose their picture from every Rekt Gang NFT, which this site hosts
+itself, at `https://rekt.structs.zone/rekt/pfp/<collection>/<id>.webp`:
+
+| Collection | `<collection>` | Numbers |
+|---|---|---|
+| Rekt Wolves | `wolves` | 1 to 2222 |
+| Trippy Wolves | `trippy-wolves` | 1 to 2222 |
+| Rekt Bulls | `bulls` | 1 to 2269 (no #364: its image is lost from IPFS) |
+| Rekt Chickens | `chickens` | 1 to 16420 (Stargaze 1–5000, Solana 5001–10000, Polygon 10001–16420) |
+| Based Rekt Chickens | `based-chickens` | 1 to 1000 (Base) |
+
+The gallery has a tab per collection (webapp's own nav tabs), each one endless
+scroll of its pictures, edge to edge; images load as they come into view, and
+the grid holds only the rows around what's in view, so even the 16,420 Chickens
+scroll and jump at once. A player who knows their picture's number finds it:
+the gallery scrolls to it and outlines it. Clicking a picture chooses it. No
+wallet is involved: the picture is the player's choice. Its controls are
+webapp's own SUI components: nav tabs, screen buttons, the text input and its
+warning, and the close link (`rekt/runtime/gallery.js`).
+
+It opens from two places:
+
+- **Sign-up**: **Choose Rekt**, beside the generated picture. That URL can't go
+  into the sign-up request's `pfp`: the guild API requires it to be JSON, which
+  the chain then refuses as a pfp. So it goes in `pfp_client_render_attributes`
+  as `url` (beside the generated layers, which other clients keep showing), the
+  player joins with it, and when they first play, their own key sets their
+  `pfp` on chain to the same URL (`MsgPlayerUpdatePfp`).
+- **Profile**: the edit button on a member's own portrait. Their key sets the
+  new picture as their `pfp` on chain at once (`MsgPlayerUpdatePfp`), and the
+  profile and HUD show it.
+
+Rekt pictures are shown from whichever host serves the page (`/rekt/pfp/…`),
+so they show in development too; other clients load them from
+rekt.structs.zone.
+
+The pictures are made from the Rekt Gang NFT archive (`../RektGang`, with its
+`README.txt`) by [`rekt/make_pfps.py`](rekt/make_pfps.py): 256px square WebP,
+the illustrated collections resized (quality 80), the pixel-art Chickens kept
+pixel for pixel (4×, lossless, and drawn sharp at any size). They come to about
+93 MB in 24,132 files, which the dev server serves from disk and the build
+copies into `dist/rekt/pfp/` as they are. `rekt/pfp/collections.json` lists
+the collections for the gallery.
+
+```bash
+../RektGang/.venv/bin/python -I rekt/make_pfps.py ../RektGang   # keeps existing pictures
+```
 
 ## Which guild
 
@@ -94,7 +157,7 @@ npm run build        # dist/
 
 `dist/` is a static site: `index.html` (webapp's game page), the bundles in
 `js/` and webapp's `css/`, `img/`, `lottie/` and fonts, plus `guild.json` and
-Rekt Gang's art in `rekt/`. It uses absolute paths, so serve it from the root
+Rekt Gang's art in `rekt/`, its NFT pictures in `rekt/pfp/`. It uses absolute paths, so serve it from the root
 of `rekt.structs.zone`; it needs nothing else on that domain, but `guild.json`
 must be readable cross-origin (`Access-Control-Allow-Origin: *`), since other
 clients read it. `.github/workflows/pages.yml` publishes it to GitHub Pages.
@@ -102,4 +165,5 @@ clients read it. `.github/workflows/pages.yml` publishes it to GitHub Pages.
 ## Licences
 
 structs-webapp is Apache-2.0 (Slow Ninja Inc). Rekt Gang's logo and icons in
-`rekt/public/` are Rekt Gang's own, used for its guild.
+`rekt/public/`, and the NFT art in `rekt/pfp/`, are Rekt Gang's own, used for
+its guild.

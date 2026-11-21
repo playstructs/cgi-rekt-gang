@@ -1,0 +1,49 @@
+[
+  {
+    "slug": "wolves",
+    "name": "Rekt Wolves",
+    "label": "Wolves",
+    "pixel": false,
+    "first": 1,
+    "last": 2222,
+    "missing": []
+  },
+  {
+    "slug": "trippy-wolves",
+    "name": "Trippy Wolves",
+    "label": "Trippy",
+    "pixel": false,
+    "first": 1,
+    "last": 2222,
+    "missing": []
+  },
+  {
+    "slug": "bulls",
+    "name": "Rekt Bulls",
+    "label": "Bulls",
+    "pixel": false,
+    "first": 1,
+    "last": 2269,
+    "missing": [
+      364
+    ]
+  },
+  {
+    "slug": "chickens",
+    "name": "Rekt Chickens",
+    "label": "Chickens",
+    "pixel": true,
+    "first": 1,
+    "last": 16420,
+    "missing": []
+  },
+  {
+    "slug": "based-chickens",
+    "name": "Based Rekt Chickens",
+    "label": "Based",
+    "pixel": true,
+    "first": 1,
+    "last": 1000,
+    "missing": []
+  }
+]

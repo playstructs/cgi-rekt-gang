@@ -76,8 +76,10 @@ the grid holds only the rows around what's in view, so even the 16,420 Chickens
 scroll and jump at once. A player who knows their picture's number finds it:
 the gallery scrolls to it and outlines it. Clicking a picture chooses it. No
 wallet is involved: the picture is the player's choice. Its controls are
-webapp's own SUI components: nav tabs, screen buttons, the text input and its
-warning, and the close link (`rekt/runtime/gallery.js`).
+webapp's own SUI components: nav tabs, screen buttons, the text input and the
+close link (`rekt/runtime/gallery.js`). **Find** is on only for a number the
+collection has. On a short screen its tabs, number field and close link share
+one row.
 
 It opens from two places:
 
